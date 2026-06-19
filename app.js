@@ -4,6 +4,7 @@ let barChart = null;
 let donutChart = null;
 let lineChart = null;
 let performanceChart = null;
+let monthlyChart = null;
 
 function normalizeKey(k) {
   return (k || '').toString().trim().toLowerCase();
@@ -94,6 +95,16 @@ function renderData(rows) {
   const categoryList = sortedCategories.slice(0, 3).map(([name, value]) => `${name}: ${formatCurrency(value)}`).join(' • ') || 'Sem categorias definidas';
   document.getElementById('categoryStats').innerText = `Top categorias: ${categoryList}`;
 
+  const monthlyAmounts = parsed.reduce((map, item) => {
+    if (!item.date || isNaN(item.date)) return map;
+    const month = item.date.toLocaleString('pt-BR', { month: 'short', year: 'numeric' });
+    map[month] = (map[month] || 0) + item.amount;
+    return map;
+  }, {});
+  const monthLabels = Object.keys(monthlyAmounts).sort((a, b) => new Date(a) - new Date(b));
+  const monthValues = monthLabels.map(month => monthlyAmounts[month]);
+  document.getElementById('monthlyStats').innerText = `Receita total nos últimos ${monthLabels.length} meses: ${formatCurrency(monthValues.reduce((sum, value) => sum + value, 0))}`;
+
   const statusMap = parsed.reduce((map, item) => {
     const label = buildStatusLabel(item.status);
     map[label] = (map[label] || 0) + 1;
@@ -141,10 +152,20 @@ function renderData(rows) {
     return next;
   }, 0);
 
+  const monthlyAmounts = parsed.reduce((map, item) => {
+    if (!item.date || isNaN(item.date)) return map;
+    const month = item.date.toLocaleString('pt-BR', { month: 'short', year: 'numeric' });
+    map[month] = (map[month] || 0) + item.amount;
+    return map;
+  }, {});
+  const monthLabels = Object.keys(monthlyAmounts).sort((a, b) => new Date(a) - new Date(b));
+  const monthValues = monthLabels.map(month => monthlyAmounts[month]);
+
   safeDestroy(barChart);
   safeDestroy(donutChart);
   safeDestroy(lineChart);
   safeDestroy(performanceChart);
+  safeDestroy(monthlyChart);
 
   const barCtx = document.getElementById('barChart').getContext('2d');
   barChart = new Chart(barCtx, {
@@ -188,6 +209,36 @@ function renderData(rows) {
       maintainAspectRatio: false,
       plugins: {
         legend: { position: 'bottom', labels: { color: '#44596f' } }
+      }
+    }
+  });
+
+  const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+  monthlyChart = new Chart(monthlyCtx, {
+    type: 'line',
+    data: {
+      labels: monthLabels,
+      datasets: [{
+        label: 'Receita por mês',
+        data: monthValues,
+        borderColor: '#f6a455',
+        backgroundColor: 'rgba(246,164,85,0.18)',
+        fill: true,
+        tension: 0.25,
+        pointRadius: 4,
+        pointBackgroundColor: '#f6a455'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, labels: { color: '#44596f' } },
+        tooltip: { callbacks: { label: context => formatCurrency(context.parsed.y) } }
+      },
+      scales: {
+        x: { ticks: { color: '#44596f' } },
+        y: { ticks: { color: '#44596f', callback: value => formatCurrency(value) } }
       }
     }
   });
