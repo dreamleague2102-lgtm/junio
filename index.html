@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard Financeiro</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+</head>
+<body>
+  <header class="top">
+    <div class="top-left">
+      <span class="eyebrow">Painel Corporativo</span>
+      <h1>Dashboard Financeiro</h1>
+      <p>Visualize a evolução dos seus valores em tempo real a partir da planilha, com indicadores claros e informações prontas para decisão.</p>
+    </div>
+    <div class="top-right">
+      <div class="top-status">
+        <span class="status-label">Auto-refresh</span>
+        <strong id="refreshCountdown">Próxima atualização em —</strong>
+        <span id="lastUpdate">Última atualização: —</span>
+      </div>
+      <button id="refreshButton" type="button">Atualizar agora</button>
+    </div>
+  </header>
+
+  <section class="overview">
+    <div class="kpi-grid">
+      <article class="kpi-card primary">
+        <span>Total de registros</span>
+        <strong id="card-count">—</strong>
+      </article>
+      <article class="kpi-card">
+        <span>Total do mês</span>
+        <strong id="card-month">—</strong>
+      </article>
+      <article class="kpi-card">
+        <span>Saldo acumulado</span>
+        <strong id="card-balance">—</strong>
+      </article>
+      <article class="kpi-card">
+        <span>Valor médio</span>
+        <strong id="card-average">—</strong>
+      </article>
+      <article class="kpi-card">
+        <span>Registros pagos</span>
+        <strong id="card-paid">—</strong>
+      </article>
+      <article class="kpi-card">
+        <span>Registros pendentes</span>
+        <strong id="card-pending">—</strong>
+      </article>
+    </div>
+    <div class="summary-grid">
+      <article class="summary-card">
+        <span>Top categoria</span>
+        <strong id="summaryTopCategory">—</strong>
+      </article>
+      <article class="summary-card">
+        <span>Média diária</span>
+        <strong id="summaryDailyAverage">—</strong>
+      </article>
+      <article class="summary-card">
+        <span>Total de categorias</span>
+        <strong id="summaryCategoryCount">—</strong>
+      </article>
+    </div>
+  </section>
+
+  <main class="dashboard-grid">
+    <section class="panel panel-main">
+      <div class="panel-header">
+        <div>
+          <h2>Receita por categoria</h2>
+          <p id="categoryStats">Carregando métricas por categoria...</p>
+        </div>
+      </div>
+      <div class="chart-wrapper"><canvas id="barChart"></canvas></div>
+    </section>
+
+    <section class="panel panel-side">
+      <div class="panel-header"><h2>Pago x Pendente</h2></div>
+      <div class="chart-wrapper compact"><canvas id="donutChart"></canvas></div>
+    </section>
+
+    <section class="panel panel-table">
+      <div class="panel-header"><h2>Contas pendentes</h2></div>
+      <div class="table-wrapper">
+        <table id="dataTable">
+          <thead><tr><th>Descrição</th><th>Status</th><th>Valor</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel panel-main">
+      <div class="panel-header"><h2>Tendência de caixa</h2></div>
+      <div class="chart-wrapper"><canvas id="lineChart"></canvas></div>
+    </section>
+  </main>
+
+  <footer class="foot">Abra este arquivo pelo servidor local e atualize sua planilha para refletir os dados imediatamente.</footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
